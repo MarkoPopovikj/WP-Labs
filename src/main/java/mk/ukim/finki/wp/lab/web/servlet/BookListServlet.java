@@ -29,27 +29,7 @@ public class BookListServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        IWebExchange webExchange = JakartaServletWebApplication
-                .buildApplication(getServletContext())
-                .buildExchange(request, response);
-
-        WebContext webContext = new WebContext(webExchange);
-
-        List<Book> books;
-        String name = request.getParameter("bookName");
-        String rating = request.getParameter("rating");
-
-
-        if(name == null || name.isEmpty() || rating == null || rating.isEmpty()) {
-
-            books = bookService.findAll();
-        }else{
-
-            books = bookService.searchBook(name, Double.parseDouble(rating));
-        }
-
-        webContext.setVariable("books", books);
-        springTemplateEngine.process("listBooks.html", webContext, response.getWriter());
+        response.sendRedirect(request.getContextPath() + "/books");
     }
 
 

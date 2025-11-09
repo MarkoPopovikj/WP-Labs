@@ -23,13 +23,26 @@ public class BookController {
     }
 
     @GetMapping
-    public String getBooksPage(@RequestParam(required = false) String error, Model model){
+    public String getBooksPage(@RequestParam(required = false) String error,
+                               @RequestParam(required = false) String bookName,
+                               @RequestParam(required = false) String rating,
+                               Model model){
 
         if(error != null){
             model.addAttribute("error", error);
         }
 
-        model.addAttribute("books", bookService.findAll());
+        List<Book> books;
+
+        if(bookName == null || bookName.isEmpty() || rating == null || rating.isEmpty()) {
+
+            books = bookService.findAll();
+        }else{
+
+            books = bookService.searchBook(bookName, Double.parseDouble(rating));
+        }
+
+        model.addAttribute("books", books);
 
         return "listBooks";
     }
