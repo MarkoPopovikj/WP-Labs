@@ -95,13 +95,4 @@ public class BookServiceImpl implements BookService {
 
         bookRepository.deleteById(id);
     }
-
-    @Override
-    public List<Book> searchBook(String text, Double rating) {
-
-        if(text == null || text.isEmpty() || rating == null || rating < 0) {
-            throw new IllegalArgumentException("Invalid input");
-        }
-        return this.bookRepository.findAllByTitleContainingIgnoreCaseAndAverageRatingGreaterThanEqual(text, rating);
-    }
 }

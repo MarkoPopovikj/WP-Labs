@@ -23,7 +23,5 @@ public interface BookService {
                   Double averageRating,
                   Long authorId);
 
-    List<Book> searchBook(String text, Double rating);
-
     void deleteBook(long id);
 }
