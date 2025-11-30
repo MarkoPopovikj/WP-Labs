@@ -5,6 +5,7 @@ import mk.ukim.finki.wp.lab.model.Book;
 import mk.ukim.finki.wp.lab.repository.AuthorRepository;
 import mk.ukim.finki.wp.lab.repository.BookRepository;
 import mk.ukim.finki.wp.lab.service.BookService;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,9 +23,35 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    public List<Book> findAll(String text, Double rating, Long authorId) {
+
+        Specification<Book> spec = Specification.where(null);
+
+        // filter title
+        if (text != null && !text.isEmpty()) {
+            spec = spec.and((root1, query1, cb) ->
+                    cb.like(cb.lower(root1.get("title")), "%" + text.toLowerCase() + "%"));
+        }
+
+        // filter rating
+        if (rating != null) {
+            spec = spec.and((root1, query1, cb) ->
+                    cb.greaterThanOrEqualTo(root1.get("averageRating"), rating));
+        }
+
+        // filter author
+        if (authorId != null) {
+            spec = spec.and((root1, query1, cb) ->
+                    cb.equal(root1.get("author").get("id"), authorId));
+        }
+
+        return this.bookRepository.findAll(spec);
+    }
+
+    @Override
     public Optional<Book> findBookById(long id) {
 
-        return this.bookRepository.getBookById(id);
+        return this.bookRepository.findById(id);
     }
 
     @Override
@@ -38,7 +65,7 @@ public class BookServiceImpl implements BookService {
         }
 
         Author author = this.authorRepository.findById(authorId).get();
-        return this.bookRepository.saveBook(new Book(title, genre, averageRating, author));
+        return this.bookRepository.save(new Book(title, genre, averageRating, author));
     }
 
     @Override
@@ -52,7 +79,7 @@ public class BookServiceImpl implements BookService {
             throw new IllegalArgumentException("Invalid parameters");
         }
 
-        Book book = this.bookRepository.getBookById(bookId).get();
+        Book book = this.bookRepository.findById(bookId).get();
         Author author = this.authorRepository.findById(authorId).get();
 
         book.setTitle(title);
@@ -60,19 +87,13 @@ public class BookServiceImpl implements BookService {
         book.setAverageRating(averageRating);
         book.setAuthor(author);
 
-        return this.bookRepository.saveBook(book);
+        return this.bookRepository.save(book);
     }
 
     @Override
     public void deleteBook(long id) {
 
-        bookRepository.deleteBook(id);
-    }
-
-    @Override
-    public List<Book> findAll() {
-
-        return this.bookRepository.findAll();
+        bookRepository.deleteById(id);
     }
 
     @Override
@@ -81,6 +102,6 @@ public class BookServiceImpl implements BookService {
         if(text == null || text.isEmpty() || rating == null || rating < 0) {
             throw new IllegalArgumentException("Invalid input");
         }
-        return this.bookRepository.searchBooks(text, rating);
+        return this.bookRepository.findAllByTitleContainingIgnoreCaseAndAverageRatingGreaterThanEqual(text, rating);
     }
 }

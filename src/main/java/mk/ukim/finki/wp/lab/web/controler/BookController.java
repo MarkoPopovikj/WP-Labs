@@ -25,24 +25,18 @@ public class BookController {
     @GetMapping
     public String getBooksPage(@RequestParam(required = false) String error,
                                @RequestParam(required = false) String bookName,
-                               @RequestParam(required = false) String rating,
+                               @RequestParam(required = false) Double rating,
+                               @RequestParam(required = false) Long authorId,
                                Model model){
 
         if(error != null){
             model.addAttribute("error", error);
         }
 
-        List<Book> books;
-
-        if(bookName == null || bookName.isEmpty() || rating == null || rating.isEmpty()) {
-
-            books = bookService.findAll();
-        }else{
-
-            books = bookService.searchBook(bookName, Double.parseDouble(rating));
-        }
+        List<Book> books = this.bookService.findAll(bookName, rating, authorId);
 
         model.addAttribute("books", books);
+        model.addAttribute("authors", authorService.findAll());
 
         return "listBooks";
     }

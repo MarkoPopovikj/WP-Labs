@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BookService {
-    List<Book> findAll();
+    List<Book> findAll(String text, Double rating, Long authorId);
 
     Optional<Book> findBookById(long id);
 

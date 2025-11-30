@@ -1,16 +1,13 @@
 package mk.ukim.finki.wp.lab.repository;
 
 import mk.ukim.finki.wp.lab.model.Book;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.List;
-import java.util.Optional;
 
-public interface BookRepository {
+public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificationExecutor<Book> {
 
-    Optional<Book> getBookById(long id);
-    Book saveBook(Book book);
-    void deleteBook(long id);
-
-    List<Book> findAll();
-    List<Book> searchBooks(String text, Double rating);
+    List<Book> findAllByAuthor_Id(Long authorId);
+    List<Book> findAllByTitleContainingIgnoreCaseAndAverageRatingGreaterThanEqual(String text, Double rating);
 }
